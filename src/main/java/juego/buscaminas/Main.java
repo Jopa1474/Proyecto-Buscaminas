@@ -19,5 +19,7 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch();
+        Tablero tablero = new Tablero(8,8,8);
+        tablero.imprimirTablero();
     }
 }

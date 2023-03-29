@@ -15,7 +15,6 @@ public class Casilla {
     public Casilla(int posicionFila, int posicionColumna) {
         this.posicionFila = posicionFila;
         this.posicionColumna = posicionColumna;
-        this.mina = mina;
     }
 
     public int getPosicionFila() {
