@@ -6,15 +6,18 @@ public class Casilla {
     int posicionColumna;
     boolean mina;
 
+    int numPista;
+
     /**
      * Metodo constructor para la clase Casilla
      *
      * @param posicionFila    fila en la que se posicionara la casilla
      * @param posicionColumna columna en la que se posicionara la casilla
      */
-    public Casilla(int posicionFila, int posicionColumna) {
+    public Casilla(int posicionFila, int posicionColumna, int numPista) {
         this.posicionFila = posicionFila;
         this.posicionColumna = posicionColumna;
+        this.numPista = numPista;
     }
 
     public int getPosicionFila() {
@@ -39,5 +42,13 @@ public class Casilla {
 
     public void setMina(boolean mina) {
         this.mina = mina;
+    }
+
+    public int getNumPista() {
+        return numPista;
+    }
+
+    public void setNumPista(int numPista) {
+        this.numPista = numPista;
     }
 }
