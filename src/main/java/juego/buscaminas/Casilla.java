@@ -5,8 +5,9 @@ public class Casilla {
     int posicionFila;
     int posicionColumna;
     boolean mina;
+    int numPista = 0;
 
-    int numPista;
+    Casilla[][] casillas;
 
     /**
      * Metodo constructor para la clase Casilla
@@ -14,10 +15,9 @@ public class Casilla {
      * @param posicionFila    fila en la que se posicionara la casilla
      * @param posicionColumna columna en la que se posicionara la casilla
      */
-    public Casilla(int posicionFila, int posicionColumna, int numPista) {
+    public Casilla(int posicionFila, int posicionColumna) {
         this.posicionFila = posicionFila;
         this.posicionColumna = posicionColumna;
-        this.numPista = numPista;
     }
 
     public int getPosicionFila() {
@@ -51,4 +51,11 @@ public class Casilla {
     public void setNumPista(int numPista) {
         this.numPista = numPista;
     }
+
+
+
+    //public void getCasilla(int posicionFila, int posicionColumna){
+        //return Casilla[posicionFila][posicionFila];
+    //}
 }
+//Hacer un get casilla

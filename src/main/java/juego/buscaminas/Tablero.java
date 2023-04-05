@@ -2,6 +2,9 @@ package juego.buscaminas;
 
 import java.util.Random;
 
+/**
+ * Clase Tablero, la cual sera la que tendra las minas y los numeros pistas para poder jugar al buscaminas
+ */
 public class Tablero {
 
     Casilla[][] casillas;
@@ -11,6 +14,12 @@ public class Tablero {
     int Columnas;
     int Minas;
 
+    /**
+     * Metodo constructor del tablero mediante el cual estaran las minas y los numeros pistas para jugar
+     * @param Filas Cantidad de filas del tablero
+     * @param Columnas Cantidad de columnas del tablero
+     * @param Minas Cantidad de minas que contiene el tablero
+     */
     public Tablero(int Filas, int Columnas, int Minas) {
         this.Filas = Filas;
         this.Columnas = Columnas;
@@ -25,17 +34,21 @@ public class Tablero {
         casillas = new Casilla[this.Filas][this.Columnas];
         for (int i = 0; i < casillas.length; i++){
             for (int j = 0; j < casillas[i].length; j++){
-                casillas[i][j] = new Casilla(i, j, 0);
+                casillas[i][j] = new Casilla(i, j);
             }
         }
         colocarMinas();
         colocarPistas();
     }
-    //https://es.stackoverflow.com/questions/219005/generar-numeros-para-una-matriz-en-java para colocar un numero en una posicion aleatoria de la matriz
+
+    /**
+     * Metodo para colocar minas de manera aleatoria en el tablero
+     * @author https://es.stackoverflow.com/questions/219005/generar-numeros-para-una-matriz-en-java para colocar un numero en una posicion aleatoria de la matriz
+     */
     public void colocarMinas(){
         int minasColocadas = 0;
-        while (minasColocadas != Minas){
-            int auxFila = random.nextInt(Filas);
+        while (minasColocadas != Minas){ //Para evitar colocar minas en lugares en las que ya hay minas
+            int auxFila = random.nextInt(Filas); //Para colocar las minas de manera aleatoria
             int auxColum = random.nextInt(Columnas);
             if (!casillas[auxFila][auxColum].isMina()){
                 casillas[auxFila][auxColum].setMina(true);
@@ -43,6 +56,10 @@ public class Tablero {
             }
         }
     }
+
+    /**
+     * Metodo para colocar pistas sobre cuantas minas tiene una casilla a su alrededor
+     */
     public void colocarPistas (){
         for (int i = 0; i < casillas.length; i++) {
             for (int j = 0; j < casillas[i].length; j++) {
@@ -53,19 +70,18 @@ public class Tablero {
                 int minasAlrededor = 0;
 
                 for (int iAlrededor = i - 1; iAlrededor < i + 2; iAlrededor++) { //iAlrededor son las filas alrededor de la casilla en la cual queremos poner el numero
-                    for (int jAlrededor = j - 1; jAlrededor < j + 2; jAlrededor++) {
+                    for (int jAlrededor = j - 1; jAlrededor < j + 2; jAlrededor++) { //jAlrededor recorre las columnas alrededor de la casilla en la cual queremos poner el numero
                         if (iAlrededor < 0 || iAlrededor >= casillas.length || jAlrededor < 0 || jAlrededor >= casillas[i].length) {
                             continue; // La casilla alrededor está fuera de los límites de la matriz no se cuenta
                         }
                         if (casillas[iAlrededor][jAlrededor].isMina()){
                             minasAlrededor++;
-                            System.out.println(minasAlrededor);
+                            //System.out.println(minasAlrededor);
                         }
                     }
                 }
-                //casillas[i][j].setNumPista(minasAlrededor);
-                casillas[i][j].numPista = minasAlrededor;
-                System.out.println("yeeeeeeeeeeeeeeeeeee");
+                casillas[i][j].setNumPista(minasAlrededor);
+
             }
         }
     }
