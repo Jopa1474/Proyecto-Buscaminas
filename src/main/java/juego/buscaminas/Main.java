@@ -11,15 +11,22 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class Main extends Application {
-    int Filas = 8;
-    int Columns = 8;
-    Button[][] buttons;
+    static int Filas = 8;
+    static int Columns = 8;
+
+    static int Minas = 8;
+    static Button[][] buttons;
     Button button;
-    Casilla[][] casillas;
+
+    static Tablero tablero;
     @Override
 
+    //https://stackoverflow.com/questions/24302636/better-way-for-getting-id-of-the-clicked-object-in-javafx-controller
+    //Para asignarle un id al boton que se crea
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("hello-view.fxml"));
         AnchorPane root = fxmlLoader.<AnchorPane>load();
@@ -38,17 +45,14 @@ public class Main extends Application {
                 button.setOnAction(new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent event) {
-                        if (casillas[finalI][finalJ].isMina()){
-                            button.setText("*");
-                        }else{
-                            button.setText("1");
-                        }
+                        bntClick(event);
                     }
                 });
                 button.setPrefSize(40,40);
                 button.setLayoutX(x);
                 button.setLayoutY(y);
                 root.getChildren().add(button);
+                button.setId(i+","+j);
                 button.setText(String.valueOf(i)+","+String.valueOf(j));
 
                 y += 40;
@@ -64,8 +68,35 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        launch();
-        Tablero tablero = new Tablero(8,8,8);
+        tablero = new Tablero(Filas,Columns,Minas);
         tablero.imprimirTablero();
+        tablero.seteCasillaConPista(new Consumer<List<Casilla>>() {
+            @Override
+            public void accept(List<Casilla> casillas) {
+                for (Casilla casillaConPista: casillas){
+                    buttons[casillaConPista.getPosicionFila()][casillaConPista.getPosicionColumna()].setText(String.valueOf(casillaConPista.getNumPista()));
+                }
+            }
+        });
+        tablero.setePartidaPerdida(new Consumer<List<Casilla>>() {
+            @Override
+            public void accept(List<Casilla> casillass) {
+                for (Casilla casillaConMina: casillass){
+                    buttons[casillaConMina.getPosicionFila()][casillaConMina.getPosicionColumna()].setText("*");
+                }
+            }
+        });
+
+        launch();
+    }
+
+
+    public void bntClick(ActionEvent event){
+        Button btn = (Button)event.getSource();
+        String[] coordenada = btn.getId().split(",");
+        int posFila = Integer.parseInt(coordenada[0]);
+        int posColumna = Integer.parseInt(coordenada[1]);
+        System.out.println(posFila+","+posColumna);
+        tablero.selecCasilla(posFila, posColumna);
     }
 }

@@ -52,7 +52,11 @@ public class Casilla {
         this.numPista = numPista;
     }
 
-
+    @Override
+    public String toString() {
+        return "Casilla{" + "numPista=" + numPista +
+                '}';
+    }
 
     //public void getCasilla(int posicionFila, int posicionColumna){
         //return Casilla[posicionFila][posicionFila];

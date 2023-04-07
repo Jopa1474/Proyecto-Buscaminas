@@ -1,6 +1,9 @@
 package juego.buscaminas;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 
 /**
  * Clase Tablero, la cual sera la que tendra las minas y los numeros pistas para poder jugar al buscaminas
@@ -13,6 +16,9 @@ public class Tablero {
     int Filas;
     int Columnas;
     int Minas;
+
+    Consumer<List<Casilla>> ePartidaPerdida;
+    Consumer<List<Casilla>> eCasillaConPista;
 
     /**
      * Metodo constructor del tablero mediante el cual estaran las minas y los numeros pistas para jugar
@@ -84,6 +90,46 @@ public class Tablero {
 
             }
         }
+    }
+    //https://www.youtube.com/watch?v=JktYk991hEY&list=PLhbSLFs0SUZbafb6mA5JeRLqnl7S41wIj&index=4&ab_channel=BelisarioDeLaMata
+    public void selecCasilla(int posicionFila, int posicionColumna){
+        if (this.casillas[posicionFila][posicionColumna].isMina()){
+            List<Casilla> casillasConMinas = new LinkedList<>();
+            for (int i = 0; i < casillas.length; i++){
+                for (int j = 0; j < casillas[i].length; j++){
+                    if (casillas[i][j].isMina()){
+                        casillasConMinas.add(casillas[i][j]);
+                    }
+                }
+            }
+            ePartidaPerdida.accept(casillasConMinas);
+        }
+        else{
+            if (casillas[posicionFila][posicionColumna].getNumPista() != 0) {
+                List<Casilla> casillasConPistas = new LinkedList<>();
+                for (int i = 0; i < casillas.length; i++){
+                    for (int j = 0; j < casillas[i].length; j++){
+                        if (!casillas[i][j].isMina()){
+                            casillasConPistas.add(casillas[i][j]);
+                        }
+                    }
+                }
+                ePartidaPerdida.accept(casillasConPistas);
+                System.out.println(casillas[posicionFila][posicionColumna].getNumPista());
+            }
+            else{
+                System.out.println("0");
+            }
+        }
+
+    }
+
+    public void setePartidaPerdida(Consumer<List<Casilla>> ePartidaPerdida) {
+        this.ePartidaPerdida = ePartidaPerdida;
+    }
+
+    public void seteCasillaConPista(Consumer<List<Casilla>> eCasillaConPista) {
+        this.eCasillaConPista = eCasillaConPista;
     }
 
     public void imprimirTablero(){
