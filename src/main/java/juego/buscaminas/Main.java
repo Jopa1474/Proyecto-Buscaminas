@@ -53,7 +53,7 @@ public class Main extends Application {
                 button.setLayoutY(y);
                 root.getChildren().add(button);
                 button.setId(i+","+j);
-                button.setText(String.valueOf(i)+","+String.valueOf(j));
+                //button.setText(String.valueOf(i)+","+String.valueOf(j));
 
                 y += 40;
 
@@ -70,18 +70,18 @@ public class Main extends Application {
     public static void main(String[] args) {
         tablero = new Tablero(Filas,Columns,Minas);
         tablero.imprimirTablero();
-        tablero.seteCasillaConPista(new Consumer<List<Casilla>>() {
+        tablero.seteCasillaAbierta(new Consumer<Casilla>() {
             @Override
-            public void accept(List<Casilla> casillas) {
-                for (Casilla casillaConPista: casillas){
-                    buttons[casillaConPista.getPosicionFila()][casillaConPista.getPosicionColumna()].setText(String.valueOf(casillaConPista.getNumPista()));
-                }
+            public void accept(Casilla casilla) {
+                buttons[casilla.getPosicionFila()][casilla.getPosicionColumna()].setDisable(true);
+                buttons[casilla.getPosicionFila()][casilla.getPosicionColumna()].setText(String.valueOf(casilla.getNumPista()));
             }
         });
         tablero.setePartidaPerdida(new Consumer<List<Casilla>>() {
             @Override
             public void accept(List<Casilla> casillass) {
                 for (Casilla casillaConMina: casillass){
+                    buttons[casillaConMina.getPosicionFila()][casillaConMina.getPosicionColumna()].setDisable(true);
                     buttons[casillaConMina.getPosicionFila()][casillaConMina.getPosicionColumna()].setText("*");
                 }
             }

@@ -9,6 +9,8 @@ public class Casilla {
 
     Casilla[][] casillas;
 
+    boolean Abierta = false;
+
     /**
      * Metodo constructor para la clase Casilla
      *
@@ -50,6 +52,14 @@ public class Casilla {
 
     public void setNumPista(int numPista) {
         this.numPista = numPista;
+    }
+
+    public boolean isAbierta() {
+        return Abierta;
+    }
+
+    public void setAbierta(boolean abierta) {
+        Abierta = abierta;
     }
 
     @Override

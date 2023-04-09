@@ -18,7 +18,7 @@ public class Tablero {
     int Minas;
 
     Consumer<List<Casilla>> ePartidaPerdida;
-    Consumer<List<Casilla>> eCasillaConPista;
+    Consumer<Casilla> eCasillaAbierta;
 
     /**
      * Metodo constructor del tablero mediante el cual estaran las minas y los numeros pistas para jugar
@@ -93,6 +93,8 @@ public class Tablero {
     }
     //https://www.youtube.com/watch?v=JktYk991hEY&list=PLhbSLFs0SUZbafb6mA5JeRLqnl7S41wIj&index=4&ab_channel=BelisarioDeLaMata
     public void selecCasilla(int posicionFila, int posicionColumna){
+        eCasillaAbierta.accept(casillas[posicionFila][posicionColumna]);
+
         if (this.casillas[posicionFila][posicionColumna].isMina()){
             List<Casilla> casillasConMinas = new LinkedList<>();
             for (int i = 0; i < casillas.length; i++){
@@ -103,33 +105,42 @@ public class Tablero {
                 }
             }
             ePartidaPerdida.accept(casillasConMinas);
-        }
-        else{
-            if (casillas[posicionFila][posicionColumna].getNumPista() != 0) {
-                List<Casilla> casillasConPistas = new LinkedList<>();
-                for (int i = 0; i < casillas.length; i++){
-                    for (int j = 0; j < casillas[i].length; j++){
-                        if (!casillas[i][j].isMina()){
-                            casillasConPistas.add(casillas[i][j]);
+        }else {
+            if (this.casillas[posicionFila][posicionColumna].getNumPista() == 0){
+                List<Casilla> casillasAlrededor = new LinkedList<>();
+
+                for (int i = 0; i < casillas.length; i++) {
+                    for (int j = 0; j < casillas[i].length; j++) {
+                        if (casillas[i][j].getNumPista() == 0){
+                            for (int iAlrededor = i - 1; iAlrededor < i + 2; iAlrededor++) { //iAlrededor son las filas alrededor de la casilla en la cual queremos poner el numero
+                                for (int jAlrededor = j - 1; jAlrededor < j + 2; jAlrededor++) { //jAlrededor recorre las columnas alrededor de la casilla en la cual queremos poner el numero
+                                    if (iAlrededor < 0 || iAlrededor >= casillas.length || jAlrededor < 0 || jAlrededor >= casillas[i].length) {
+                                        continue; // La casilla alrededor está fuera de los límites de la matriz no se cuenta
+                                    }
+                                    if (!casillas[iAlrededor][jAlrededor].isMina() & casillas[iAlrededor][jAlrededor].getNumPista() == 0){
+                                        casillasAlrededor.add(casillas[iAlrededor][jAlrededor]);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-                ePartidaPerdida.accept(casillasConPistas);
-                System.out.println(casillas[posicionFila][posicionColumna].getNumPista());
-            }
-            else{
-                System.out.println("0");
+                for (Casilla casilla: casillasAlrededor){
+                    if (!casilla.isAbierta()){
+                        casilla.setAbierta(true);
+                        selecCasilla(casilla.getPosicionFila(), casilla.getPosicionColumna());
+                    }
+                }
             }
         }
-
     }
 
     public void setePartidaPerdida(Consumer<List<Casilla>> ePartidaPerdida) {
         this.ePartidaPerdida = ePartidaPerdida;
     }
 
-    public void seteCasillaConPista(Consumer<List<Casilla>> eCasillaConPista) {
-        this.eCasillaConPista = eCasillaConPista;
+    public void seteCasillaAbierta(Consumer<Casilla> eCasillaAbierta) {
+        this.eCasillaAbierta = eCasillaAbierta;
     }
 
     public void imprimirTablero(){
