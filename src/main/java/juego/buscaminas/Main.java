@@ -6,9 +6,9 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import juego.buscaminas.ControlArduino.InicializarControl;
 
 import java.io.IOException;
 import java.util.List;
@@ -68,6 +68,7 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
+        InicializarControl inicializarControl = new InicializarControl();
         tablero = new Tablero(Filas,Columns,Minas);
         tablero.imprimirTablero();
         tablero.seteCasillaAbierta(new Consumer<Casilla>() {
@@ -88,6 +89,7 @@ public class Main extends Application {
         });
 
         launch();
+
     }
 
 
@@ -99,4 +101,5 @@ public class Main extends Application {
         System.out.println(posFila+","+posColumna);
         tablero.selecCasilla(posFila, posColumna);
     }
+
 }
