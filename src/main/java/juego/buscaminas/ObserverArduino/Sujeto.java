@@ -1,4 +1,4 @@
-package juego.buscaminas.Observer;
+package juego.buscaminas.ObserverArduino;
 
 public interface Sujeto {
 
@@ -11,5 +11,7 @@ public interface Sujeto {
     public void notificarAbajo();
 
     public void notificarSeleccionar();
+
+
 
 }

@@ -1,4 +1,4 @@
-package juego.buscaminas.Observer;
+package juego.buscaminas.ObserverArduino;
 
 public interface Observador {
 
@@ -11,4 +11,6 @@ public interface Observador {
     public void updateAbajo();
 
     public void updateSeleccionar();
+
+
 }

@@ -1,5 +1,8 @@
 package juego.buscaminas;
 
+import juego.buscaminas.EstructurasLineales.ListaEnlazada;
+
+import javax.swing.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -8,14 +11,18 @@ import java.util.function.Consumer;
 /**
  * Clase Tablero, la cual sera la que tendra las minas y los numeros pistas para poder jugar al buscaminas
  */
-public class Tablero {
+public class Tablero  {
 
     Casilla[][] casillas;
-
     Random random = new Random();
     int Filas;
     int Columnas;
     int Minas;
+
+    ListaEnlazada casillasNoSelec;
+
+    boolean DummyMode = false;
+
     Consumer<List<Casilla>> ePartidaPerdida;
     Consumer<Casilla> eCasillaAbierta;
 
@@ -36,14 +43,18 @@ public class Tablero {
      * Metodo para asignar una casilla a cada posicion del tablero
      */
     public void iniciarCasillas(){
+        casillasNoSelec = new ListaEnlazada();
         casillas = new Casilla[this.Filas][this.Columnas];
         for (int i = 0; i < casillas.length; i++){
             for (int j = 0; j < casillas[i].length; j++){
                 casillas[i][j] = new Casilla(i, j);
+                casillasNoSelec.insertFirst(casillas[i][j]);
             }
         }
         colocarMinas();
         colocarPistas();
+        casillasNoSelec.displayList();
+
     }
 
     /**
@@ -93,6 +104,7 @@ public class Tablero {
     //https://www.youtube.com/watch?v=JktYk991hEY&list=PLhbSLFs0SUZbafb6mA5JeRLqnl7S41wIj&index=4&ab_channel=BelisarioDeLaMata
     public void selecCasilla(int posicionFila, int posicionColumna){
         eCasillaAbierta.accept(casillas[posicionFila][posicionColumna]);
+        casillas[posicionFila][posicionColumna].setAbierta(true);
 
         if (this.casillas[posicionFila][posicionColumna].isMina()){
             List<Casilla> casillasConMinas = new LinkedList<>();
@@ -100,10 +112,15 @@ public class Tablero {
                 for (int j = 0; j < casillas[i].length; j++){
                     if (casillas[i][j].isMina()){
                         casillasConMinas.add(casillas[i][j]);
+                        casillas[i][j].setAbierta(true);
                     }
                 }
             }
             ePartidaPerdida.accept(casillasConMinas);
+
+
+
+
         }else if (this.casillas[posicionFila][posicionColumna].getNumPista() == 0){
             List<Casilla> casillassAlrededor = casillasAlrededor(posicionFila, posicionColumna);
 
@@ -111,11 +128,18 @@ public class Tablero {
                 if (!casilla.isAbierta()){
                     casilla.setAbierta(true);
                     selecCasilla(casilla.getPosicionFila(), casilla.getPosicionColumna());
+
                 }
             }
         }
     }
 
+    /**
+     * Metodo para obtener de mejor maner las casillas alrededor de una
+     * @param posicionFila posicion en la fila
+     * @param posicionColumn posicion en la columna
+     * @return las casillas que tiene alrededor
+     */
     public List<Casilla> casillasAlrededor(int posicionFila, int posicionColumn){
         List<Casilla> casillasAlrededor = new LinkedList<>();
         for (int i = 0; i < casillas.length; i++) {
@@ -149,6 +173,21 @@ public class Tablero {
         this.eCasillaAbierta = eCasillaAbierta;
     }
 
+    /**
+     * Metodo que hace que la compu elija una casilla al azar
+     */
+    public void DummyLevel(){
+        if (DummyMode){
+            int auxFila = random.nextInt(Filas); //Para colocar seleccionar una casilla de manera aleatoria
+            int auxColum = random.nextInt(Columnas);
+
+            if (!casillas[auxFila][auxColum].isAbierta()){
+                selecCasilla(auxFila,auxColum);
+            }else{
+                DummyLevel();
+            }
+        }
+    }
 
     public void imprimirTablero(){
         for (int i = 0; i < casillas.length; i++) {
@@ -162,4 +201,22 @@ public class Tablero {
             System.out.println("");
         }
     }
+
+    public boolean isDummyMode() {
+        return DummyMode;
+    }
+
+    public void setDummyMode(boolean dummyMode) {
+        DummyMode = dummyMode;
+    }
+
+    public void setDummyLevel(){
+        if (!DummyMode){
+            setDummyMode(true);
+        }else {
+            setDummyMode(false);
+        }
+    }
+
+
 }
