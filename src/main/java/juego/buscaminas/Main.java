@@ -9,6 +9,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -117,10 +119,15 @@ public class Main extends Application {
                 buttons[i][j] = button;
                 int finalI = i;
                 int finalJ = j;
-                button.setOnAction(new EventHandler<ActionEvent>() {
+
+                button.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
-                    public void handle(ActionEvent event) {
-                        bntClick(event);
+                    public void handle(MouseEvent mouseEvent) {
+                        if (mouseEvent.getButton() == MouseButton.SECONDARY){
+                            button.setText("|>");
+                        }else {
+                            bntClick(mouseEvent);
+                        }
                     }
                 });
                 button.setPrefSize(40,40);
@@ -182,8 +189,8 @@ public class Main extends Application {
     }
 
 
-    public void bntClick(ActionEvent event){
-        Button btn = (Button)event.getSource();
+    public void bntClick(MouseEvent mouseEvent){
+        Button btn = (Button)mouseEvent.getSource();
         String[] coordenada = btn.getId().split(",");
         int posFila = Integer.parseInt(coordenada[0]);
         int posColumna = Integer.parseInt(coordenada[1]);
@@ -191,6 +198,7 @@ public class Main extends Application {
         tablero.selecCasilla(posFila, posColumna);
         tablero.DummyLevel();
     }
+
 
     //https://www.youtube.com/watch?v=pD-cWNrQogY&t=14s&ab_channel=latincoder
     //Codigo cronometro

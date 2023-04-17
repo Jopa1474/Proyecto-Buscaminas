@@ -17,6 +17,14 @@ public class ListaEnlazada {
     }
 
     /**
+     * Metodo para obtener la cabeza de la lista
+     * @return la cabeza de la lista
+     */
+    public Node getHead() {
+        return head;
+    }
+
+    /**
      * Metodo para obtener el tamano de la lista
      * @return el tamano de la lista
      */
