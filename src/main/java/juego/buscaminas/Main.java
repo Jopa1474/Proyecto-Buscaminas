@@ -15,9 +15,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import juego.buscaminas.ControlArduino.ControlArduino;
-import juego.buscaminas.ControlArduino.InicializarControl;
-
-import javax.swing.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
@@ -37,7 +34,7 @@ public class Main extends Application {
     Label lblCronometro;
     private int segundos = 0;
     private Timeline timeline;
-    static ControlArduino controlArduino;
+    //static ControlArduino controlArduino;
 
     static Tablero tablero;
     @Override
@@ -45,13 +42,9 @@ public class Main extends Application {
 
     public void start(Stage stage) throws IOException {
 
-
-
-
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("hello-view.fxml"));
         AnchorPane root = fxmlLoader.<AnchorPane>load();
         buttons = new Button[Filas][Columns];
-
 
         lblCronometro = new Label();
         lblCronometro.setText("0:0");
@@ -120,13 +113,17 @@ public class Main extends Application {
                 int finalI = i;
                 int finalJ = j;
 
+                button.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        bntClick(event);
+                    }
+                });
                 button.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent mouseEvent) {
                         if (mouseEvent.getButton() == MouseButton.SECONDARY){
                             button.setText("|>");
-                        }else {
-                            bntClick(mouseEvent);
                         }
                     }
                 });
@@ -135,10 +132,8 @@ public class Main extends Application {
                 button.setLayoutY(y);
                 root.getChildren().add(button);
                 button.setId(i+","+j);
-                //button.setText(String.valueOf(i)+","+String.valueOf(j));
 
                 y += 40;
-
             }
             x += 40;
             y = 90;
@@ -147,21 +142,23 @@ public class Main extends Application {
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();
-
         timeline.play();
     }
 
+    /**
+     * Metodo main del proyecto Buscaminas
+     * @param args
+     */
     public static void main(String[] args) {
-        InicializarControl inicializarControl = new InicializarControl();
         tablero = new Tablero(Filas,Columns,Minas);
         tablero.imprimirTablero();
         Thread arduinoThread = new Thread(() -> {
-            controlArduino = new ControlArduino();
+            ControlArduino controlArduino = new ControlArduino();
             System.out.println("Conexión con Arduino establecida.");
         });
         arduinoThread.start();
 
-        tablero.seteCasillaAbierta(new Consumer<Casilla>() {
+        tablero.seteCasillaAbierta(new Consumer<Casilla>() { //Cuando se presiona una caasilla que no es mina, se realiza este evento
             @Override
             public void accept(Casilla casilla) {
                 buttons[casilla.getPosicionFila()][casilla.getPosicionColumna()].setDisable(true);
@@ -170,56 +167,31 @@ public class Main extends Application {
                 //controlArduino.setLed(true);
             }
         });
-        tablero.setePartidaPerdida(new Consumer<List<Casilla>>() {
+        tablero.setePartidaPerdida(new Consumer<List<Casilla>>() { //Cuando se presiona una mina, se realiza este evento de partida perdida
             @Override
             public void accept(List<Casilla> casillass) {
                 for (Casilla casillaConMina: casillass){
                     buttons[casillaConMina.getPosicionFila()][casillaConMina.getPosicionColumna()].setDisable(true);
                     buttons[casillaConMina.getPosicionFila()][casillaConMina.getPosicionColumna()].setText("*");
                     //controlArduino.setBuzzerMina(true);
-                    JOptionPane.showMessageDialog(null,"Has perdido!");
-                    System.exit(0);
-
+                    //System.exit(0);
                 }
             }
         });
-
         launch();
-
     }
 
-
-    public void bntClick(MouseEvent mouseEvent){
-        Button btn = (Button)mouseEvent.getSource();
-        String[] coordenada = btn.getId().split(",");
-        int posFila = Integer.parseInt(coordenada[0]);
+    /**
+     * Metodo que se activa cada vez que le damos click a alguna casilla del tablero
+     * @param mouseEvent
+     */
+    public void bntClick(ActionEvent event){
+        Button btn = (Button)event.getSource(); //Obtenemos a que esta asociado el boton
+        String[] coordenada = btn.getId().split(","); //Obtenemos el id del boton
+        int posFila = Integer.parseInt(coordenada[0]); //Obtenemos la fila y la coordenada del boton
         int posColumna = Integer.parseInt(coordenada[1]);
-        //System.out.println(posFila+","+posColumna);
-        tablero.selecCasilla(posFila, posColumna);
+        tablero.selecCasilla(posFila, posColumna); //Usamos el metodo para seleccionar casillas en base a las coordenadas obtenidas
+        //tablero.turnoComputador();
         tablero.DummyLevel();
     }
-
-
-    //https://www.youtube.com/watch?v=pD-cWNrQogY&t=14s&ab_channel=latincoder
-    //Codigo cronometro
-    private static void delaySegundo(){
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    public static void Cronometro(){
-        int minutos = 0;
-        int segundos = 0;
-        for (minutos = 0; minutos < 60; minutos++){
-            for (segundos = 0; segundos < 60; segundos++) {
-
-                delaySegundo();
-            }
-        }
-    }
-
-
-
 }

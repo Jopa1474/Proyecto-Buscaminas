@@ -18,13 +18,21 @@ public class Tablero  {
     int Filas;
     int Columnas;
     int Minas;
-
     ListaEnlazada casillasNoSelec;
-
     boolean DummyMode = false;
-
+    boolean AdvancedMode = false;
+    boolean PartidaPerdida = false;
     Consumer<List<Casilla>> ePartidaPerdida;
     Consumer<Casilla> eCasillaAbierta;
+
+    //ListaEnlazada listaGeneral = new ListaEnlazada();
+    //ListaEnlazada listaIncertidumbre = new ListaEnlazada();
+    //ListaEnlazada listaSegura = new ListaEnlazada();
+
+    private ListaEnlazada<Casilla> listaGeneral = new ListaEnlazada<>(); // Lista de celdas disponibles
+    private ListaEnlazada<Casilla> listaSegura = new ListaEnlazada<>();  // Lista de celdas sin minas
+    private ListaEnlazada<Casilla> listaIncertidumbre = new ListaEnlazada<>(); // Lista de celdas con posible mina
+
 
     /**
      * Metodo constructor del tablero mediante el cual estaran las minas y los numeros pistas para jugar
@@ -48,12 +56,14 @@ public class Tablero  {
         for (int i = 0; i < casillas.length; i++){
             for (int j = 0; j < casillas[i].length; j++){
                 casillas[i][j] = new Casilla(i, j);
-                casillasNoSelec.insertFirst(casillas[i][j]);
+                //casillasNoSelec.insertFirst(casillas[i][j]);
+                listaGeneral.insertFirst(casillas[i][j]);
             }
         }
         colocarMinas();
         colocarPistas();
-        casillasNoSelec.displayList();
+        //casillasNoSelec.displayList();
+        listaGeneral.displayList();
 
     }
 
@@ -101,11 +111,19 @@ public class Tablero  {
             }
         }
     }
-    //https://www.youtube.com/watch?v=JktYk991hEY&list=PLhbSLFs0SUZbafb6mA5JeRLqnl7S41wIj&index=4&ab_channel=BelisarioDeLaMata
-    public void selecCasilla(int posicionFila, int posicionColumna){
-        eCasillaAbierta.accept(casillas[posicionFila][posicionColumna]);
-        casillas[posicionFila][posicionColumna].setAbierta(true);
 
+    /**
+     * Metodo que realiza la accion de seleccionar la casilla a la hora de pesionarla y que dependiendo si tiene mina, o si su pista es igual a 0 o no, realiza acciones diferentes
+     * @param posicionFila posicion de la fila de la casilla
+     * @param posicionColumna posicion de la columna de la casilla
+     * @author https://www.youtube.com/watch?v=JktYk991hEY&list=PLhbSLFs0SUZbafb6mA5JeRLqnl7S41wIj&index=4&ab_channel=BelisarioDeLaMata
+     */
+    public void selecCasilla(int posicionFila, int posicionColumna){
+        eCasillaAbierta.accept(casillas[posicionFila][posicionColumna]); //Si se selecciona una casilla que solo contiene un numero de pista normal, solo se abre ella
+        casillas[posicionFila][posicionColumna].setAbierta(true);
+        listaGeneral.delete(casillas[posicionFila][posicionColumna]);
+
+        //Si tiene mina, abre todas las casillas con minas
         if (this.casillas[posicionFila][posicionColumna].isMina()){
             List<Casilla> casillasConMinas = new LinkedList<>();
             for (int i = 0; i < casillas.length; i++){
@@ -113,14 +131,15 @@ public class Tablero  {
                     if (casillas[i][j].isMina()){
                         casillasConMinas.add(casillas[i][j]);
                         casillas[i][j].setAbierta(true);
+
                     }
                 }
             }
             ePartidaPerdida.accept(casillasConMinas);
+            JOptionPane.showMessageDialog(null,"Has perdido!");
+            setPartidaPerdida(true);
 
-
-
-
+        //Si el numero de pista es igual a 0, abre todas las casillas a su alrededor que sean 0 tambien hasta llegar a casillas con numero de pista mayor a 0
         }else if (this.casillas[posicionFila][posicionColumna].getNumPista() == 0){
             List<Casilla> casillassAlrededor = casillasAlrededor(posicionFila, posicionColumna);
 
@@ -128,14 +147,13 @@ public class Tablero  {
                 if (!casilla.isAbierta()){
                     casilla.setAbierta(true);
                     selecCasilla(casilla.getPosicionFila(), casilla.getPosicionColumna());
-
                 }
             }
         }
     }
 
     /**
-     * Metodo para obtener de mejor maner las casillas alrededor de una
+     * Metodo para obtener de mejor manera las casillas alrededor de una
      * @param posicionFila posicion en la fila
      * @param posicionColumn posicion en la columna
      * @return las casillas que tiene alrededor
@@ -189,6 +207,16 @@ public class Tablero  {
         }
     }
 
+    public void AdvancedLevel(){
+        ListaEnlazada listaGeneralActualizada = new ListaEnlazada();
+
+    }
+
+    public void Pistas(){
+
+    }
+
+
     public void imprimirTablero(){
         for (int i = 0; i < casillas.length; i++) {
             for (int j = 0; j < casillas[i].length; j++) {
@@ -201,6 +229,8 @@ public class Tablero  {
             System.out.println("");
         }
     }
+
+
 
     public boolean isDummyMode() {
         return DummyMode;
@@ -218,5 +248,11 @@ public class Tablero  {
         }
     }
 
+    public boolean isPartidaPerdida() {
+        return PartidaPerdida;
+    }
 
+    public void setPartidaPerdida(boolean partidaPerdida) {
+        PartidaPerdida = partidaPerdida;
+    }
 }

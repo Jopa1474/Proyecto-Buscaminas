@@ -1,11 +1,13 @@
 package juego.buscaminas.EstructurasLineales;
 
-/**
- * Clase que crea una lista enlazada la cual va a contener las casillas del tablero
- */
-public class ListaEnlazada {
 
-    private Node head;
+/**
+ * Clase que crea una lista enlazada generica la cual va a contener las casillas del tablero
+ * @author https://www.youtube.com/watch?v=8xx6A8PIFyE&ab_channel=UniversitatPolit%C3%A8cnicadeVal%C3%A8ncia-UPV
+ */
+public class ListaEnlazada<E> {
+
+    private Node<E> head;
     private int size;
 
     /**
@@ -20,7 +22,7 @@ public class ListaEnlazada {
      * Metodo para obtener la cabeza de la lista
      * @return la cabeza de la lista
      */
-    public Node getHead() {
+    public Node<E> getHead() {
         return head;
     }
 
@@ -36,8 +38,8 @@ public class ListaEnlazada {
      * Metodo para insertar un objeto al inicio de la lista
      * @param data el objeto que queremos insertar
      */
-    public void insertFirst(Object data){
-        Node newNode = new Node(data);
+    public void insertFirst(E data){
+        Node<E> newNode = new Node<E>(data);
         newNode.setNext(this.head);
         this.head = newNode;
         this.size++;
@@ -47,9 +49,9 @@ public class ListaEnlazada {
      * Metodo para eliminar el primer elemento de la lista
      * @return
      */
-    public Node deleteFirst(){
+    public Node<E> deleteFirst(){
         if (this.head != null){
-            Node temp = this.head;
+            Node<E> temp = this.head;
             this.head = this.head.getNext();
             this.size--;
         }else {
@@ -62,9 +64,9 @@ public class ListaEnlazada {
      * Metodo para borrar un determinado objeto de la lista
      * @param searchValue el ojeto que queremos eliminar
      */
-    public Node delete(Object searchValue) {
-        Node current = this.head;
-        Node previous = this.head;
+    public Node<E> delete(E searchValue) {
+        Node<E> current = this.head;
+        Node<E> previous = this.head;
 
         while (current != null){
             if (current.getData().equals(searchValue)){
@@ -86,10 +88,10 @@ public class ListaEnlazada {
      * Metodo para imprimir la lista en la terminal
      */
     public void displayList(){
-        Node curent = this.head;
-        while (curent != null){
-            System.out.println(curent.getData().toString());
-            curent = curent.getNext();
+        Node<E> current = this.head;
+        while (current != null){
+            System.out.print(current.getData().toString());
+            current = current.getNext();
         }
     }
 
@@ -98,8 +100,8 @@ public class ListaEnlazada {
      * @param searchValue el elemento que deseamos encontrar
      * @return en caso de encontrarlo, devuelve el elemento buscado
      */
-    public Node find(Object searchValue){
-        Node current = this.head;
+    public Node<E> find(E searchValue){
+        Node<E> current = this.head;
         while (current != null){
             if (current.getData().equals(searchValue)){
                 System.out.println("El coso si esta");
@@ -110,5 +112,6 @@ public class ListaEnlazada {
         }
         return null;
     }
+
 
 }

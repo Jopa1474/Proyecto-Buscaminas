@@ -82,6 +82,8 @@ public class MoverCasilla implements Observador {
             robot = new Robot();
             robot.keyPress(KeyEvent.VK_ENTER);
             robot.keyRelease(KeyEvent.VK_ENTER);
+            //robot.mousePress(MouseEvent.BUTTON1_DOWN_MASK);
+
         } catch (AWTException e) {
             throw new RuntimeException(e);
         }

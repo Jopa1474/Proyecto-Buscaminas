@@ -112,7 +112,7 @@ public class Casilla {
      */
     @Override
     public String toString() {
-        return "Casilla:" + posicionFila + "," + posicionColumna;
+        return "[" + posicionFila + "," + posicionColumna +"]";
     }
 
 }
