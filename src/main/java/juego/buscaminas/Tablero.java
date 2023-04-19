@@ -1,7 +1,7 @@
 package juego.buscaminas;
 
 import juego.buscaminas.EstructurasLineales.ListaEnlazada;
-
+import juego.buscaminas.EstructurasLineales.Stack;
 import javax.swing.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,20 +19,19 @@ public class Tablero  {
     int Columnas;
     int Minas;
     ListaEnlazada casillasNoSelec;
-    boolean DummyMode = false;
+    boolean DummyMode = true;
     boolean AdvancedMode = false;
-    boolean PartidaPerdida = false;
+
     Consumer<List<Casilla>> ePartidaPerdida;
     Consumer<Casilla> eCasillaAbierta;
 
-    //ListaEnlazada listaGeneral = new ListaEnlazada();
-    //ListaEnlazada listaIncertidumbre = new ListaEnlazada();
-    //ListaEnlazada listaSegura = new ListaEnlazada();
+    ListaEnlazada listaCasillasSinMina = new ListaEnlazada();// Lista de celdas disponibles
 
-    private ListaEnlazada<Casilla> listaGeneral = new ListaEnlazada<>(); // Lista de celdas disponibles
-    private ListaEnlazada<Casilla> listaSegura = new ListaEnlazada<>();  // Lista de celdas sin minas
-    private ListaEnlazada<Casilla> listaIncertidumbre = new ListaEnlazada<>(); // Lista de celdas con posible mina
+    LinkedList<Casilla> listaGeneral = new LinkedList<>();// Lista de celdas disponibles
+    LinkedList<Casilla> listaIncertidumbre = new LinkedList<>();// Lista de celdas sin minas
+    LinkedList<Casilla> listaSegura = new LinkedList<>();// Lista de celdas con posible mina
 
+    Stack stackListPistas = new Stack();
 
     /**
      * Metodo constructor del tablero mediante el cual estaran las minas y los numeros pistas para jugar
@@ -56,15 +55,15 @@ public class Tablero  {
         for (int i = 0; i < casillas.length; i++){
             for (int j = 0; j < casillas[i].length; j++){
                 casillas[i][j] = new Casilla(i, j);
-                //casillasNoSelec.insertFirst(casillas[i][j]);
-                listaGeneral.insertFirst(casillas[i][j]);
+                listaCasillasSinMina.insertFirst(casillas[i][j]);
+                listaGeneral.add(casillas[i][j]);
             }
         }
         colocarMinas();
         colocarPistas();
-        //casillasNoSelec.displayList();
-        listaGeneral.displayList();
-
+        listaCasillasSinMina.displayList();
+        inicializarStackList();
+        Pistas();
     }
 
     /**
@@ -121,7 +120,14 @@ public class Tablero  {
     public void selecCasilla(int posicionFila, int posicionColumna){
         eCasillaAbierta.accept(casillas[posicionFila][posicionColumna]); //Si se selecciona una casilla que solo contiene un numero de pista normal, solo se abre ella
         casillas[posicionFila][posicionColumna].setAbierta(true);
-        listaGeneral.delete(casillas[posicionFila][posicionColumna]);
+        listaGeneral.removeFirstOccurrence(casillas[posicionFila][posicionColumna]);
+
+        //En caso de que la lista de casillas este vacia, se gana el juego
+        if (listaCasillasSinMina == null) {
+            JOptionPane.showMessageDialog(null, "Felicidades, has ganado!");
+        }else {
+            listaCasillasSinMina.delete(casillas[posicionFila][posicionColumna]);
+        }
 
         //Si tiene mina, abre todas las casillas con minas
         if (this.casillas[posicionFila][posicionColumna].isMina()){
@@ -137,7 +143,8 @@ public class Tablero  {
             }
             ePartidaPerdida.accept(casillasConMinas);
             JOptionPane.showMessageDialog(null,"Has perdido!");
-            setPartidaPerdida(true);
+            //setPartidaPerdida(true);
+            //System.exit(0);
 
         //Si el numero de pista es igual a 0, abre todas las casillas a su alrededor que sean 0 tambien hasta llegar a casillas con numero de pista mayor a 0
         }else if (this.casillas[posicionFila][posicionColumna].getNumPista() == 0){
@@ -207,16 +214,80 @@ public class Tablero  {
         }
     }
 
-    public void AdvancedLevel(){
-        ListaEnlazada listaGeneralActualizada = new ListaEnlazada();
-
+    /**
+     * Metodo que selecciona una posicion aleatoria de este caso la lista general
+     * @return
+     */
+    private Casilla seleccionarPosicionAleatoria() {
+        Random random = new Random();
+        int indice = random.nextInt(listaGeneral.size());
+        Casilla posicion = listaGeneral.get(indice);
+        if (!posicion.isMina()){
+            selecCasilla(posicion.getPosicionFila(), posicion.getPosicionColumna());
+        }
+        return posicion;
     }
 
-    public void Pistas(){
-
+    /**
+     * Metodo para actualizar las listas y eliminar una celda de la lista general
+     * @param posicion posicion de la lista general
+     */
+    private void actualizarListas(Casilla posicion) {
+        listaGeneral.removeFirstOccurrence(posicion);
+        if (posicion.isMina()) {
+            listaIncertidumbre.add(posicion);
+        } else {
+            listaSegura.add(posicion);
+        }
+        System.out.println("Lista general: " + listaGeneral);
+        System.out.println("Lista segura: " + listaSegura);
+        System.out.println("Lista incertidumbre: " + listaIncertidumbre);
     }
 
+    /**
+     * Método para que la compu seleccione una casilla en base a las listas predeterminadas
+     */
+    public void AdvancedLevel() {
+        if (isAdvancedMode()){
+            // Crear lista general actualizada con las celdas disponibles
+            LinkedList<Casilla> listaGeneralActualizada = new LinkedList<Casilla>(listaGeneral);
+            for (Casilla posicion : listaSegura) {
+                listaGeneralActualizada.removeFirstOccurrence(posicion);
+            }
+            for (Casilla posicion : listaIncertidumbre) {
+                listaGeneralActualizada.removeFirstOccurrence(posicion);
+            }
+            // Selecciona una posición aleatoria de la lista general actualizada
+            Casilla posicion = seleccionarPosicionAleatoria();
+            // Actualizar las listas
+            actualizarListas(posicion);
+        }
+    }
 
+    /**
+     * Metodo para anadir todas las casillas sin minas a la Pila
+     */
+    public void inicializarStackList(){
+        for (int i = 0; i < casillas.length; i++) {
+            for (int j = 0; j < casillas[i].length; j++) {
+                if (!casillas[i][j].isMina()) {
+                    stackListPistas.push(casillas[i][j]);
+                }
+            }
+        }
+    }
+
+    /**
+     * Metodo encargado de proporcionar una pista al jugador
+     */
+    public void Pistas() {
+        //Casilla casilla = (Casilla) stackListPistas.peek();
+        //selecCasilla(casilla[casilla.getPosicionFila()], casilla.getPosicionColumna());
+    }
+
+    /**
+     * Metodo que imprime en la consola el tablero del buscaminas con sus pistas y minas
+     */
     public void imprimirTablero(){
         for (int i = 0; i < casillas.length; i++) {
             for (int j = 0; j < casillas[i].length; j++) {
@@ -230,29 +301,55 @@ public class Tablero  {
         }
     }
 
-
-
+    /**
+     * Metodo para saber si DummyMode es true o false
+     * @return true o false
+     */
     public boolean isDummyMode() {
         return DummyMode;
     }
 
+    /**
+     * Metodo para setear a DummyMode como true o false
+     * @param dummyMode
+     */
     public void setDummyMode(boolean dummyMode) {
         DummyMode = dummyMode;
     }
 
+    /**
+     * Metodo para cuando DummyMode sea true, AdvancedMode sea false
+     */
     public void setDummyLevel(){
         if (!DummyMode){
             setDummyMode(true);
-        }else {
-            setDummyMode(false);
+            setAdvancedMode(false);
         }
     }
 
-    public boolean isPartidaPerdida() {
-        return PartidaPerdida;
+    /**
+     * Metodo para cuando AdvancedMode sea true, DummyMode sea false
+     */
+    public void setAdvancedLevel(){
+        if(!AdvancedMode){
+            setDummyMode(false);
+            setAdvancedMode(true);
+        }
     }
 
-    public void setPartidaPerdida(boolean partidaPerdida) {
-        PartidaPerdida = partidaPerdida;
+    /**
+     * Metodo para saber si AdvancedMode es true o false
+     * @return true o false
+     */
+    public boolean isAdvancedMode() {
+        return AdvancedMode;
+    }
+
+    /**
+     * Metodo para setear a AdvancedMode como true o false
+     * @param advancedMode
+     */
+    public void setAdvancedMode(boolean advancedMode) {
+        AdvancedMode = advancedMode;
     }
 }

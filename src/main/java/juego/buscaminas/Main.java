@@ -84,7 +84,7 @@ public class Main extends Application {
         btnAdvancedLvl.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-
+                tablero.setAdvancedLevel();
             }
         });
 
@@ -174,7 +174,7 @@ public class Main extends Application {
                     buttons[casillaConMina.getPosicionFila()][casillaConMina.getPosicionColumna()].setDisable(true);
                     buttons[casillaConMina.getPosicionFila()][casillaConMina.getPosicionColumna()].setText("*");
                     //controlArduino.setBuzzerMina(true);
-                    //System.exit(0);
+
                 }
             }
         });
@@ -183,7 +183,7 @@ public class Main extends Application {
 
     /**
      * Metodo que se activa cada vez que le damos click a alguna casilla del tablero
-     * @param mouseEvent
+     * @param event
      */
     public void bntClick(ActionEvent event){
         Button btn = (Button)event.getSource(); //Obtenemos a que esta asociado el boton
@@ -191,7 +191,7 @@ public class Main extends Application {
         int posFila = Integer.parseInt(coordenada[0]); //Obtenemos la fila y la coordenada del boton
         int posColumna = Integer.parseInt(coordenada[1]);
         tablero.selecCasilla(posFila, posColumna); //Usamos el metodo para seleccionar casillas en base a las coordenadas obtenidas
-        //tablero.turnoComputador();
+        tablero.AdvancedLevel();
         tablero.DummyLevel();
     }
 }

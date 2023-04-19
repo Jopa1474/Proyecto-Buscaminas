@@ -3,15 +3,15 @@ package juego.buscaminas.EstructurasLineales;
 /**
  * Clase que crea un nodo el cual va dentro de la clase ListaEnlazada
  */
-public class Node<E>{
-    private E data;
-    private Node<E> next;
+public class Node{
+    private Object data;
+    private Node next;
 
     /**
      * Metodo constructor para la clase Node
      * @param data
      */
-    public Node(E data){
+    public Node(Object data){
         this.next = null;
         this.data = data;
     }
@@ -20,14 +20,14 @@ public class Node<E>{
      * Metodo para obtener la data del objeto que se encuentra en un determinado nodo
      * @return la data del objeto que se encuentra en el nodo
      */
-    public E getData(){
+    public Object getData(){
         return this.data;
     }
 
     /**
      * Metodo para asignarle una data al nodo
      */
-    public void setData(E data){
+    public void setData(Object data){
         this.data = data;
     }
 
@@ -35,7 +35,7 @@ public class Node<E>{
      * Metodo para obtener el siguiente nodo en la lista enlazada
      * @return el siguiente nodo de la lista enlazada
      */
-    public Node<E> getNext(){
+    public Node getNext(){
         return this.next;
     }
 
@@ -43,7 +43,7 @@ public class Node<E>{
      * Metodo para asignar un nodo como el siguiente en la lista enlazada
      * @param node el nodo que queremos asignar como siguiente
      */
-    public  void setNext(Node<E> node){
+    public  void setNext(Node node){
         this.next = node;
     }
 }
